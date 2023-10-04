@@ -7,7 +7,7 @@ if not cap.isOpened():
     print("Cannot open camera")
     exit()
 
-test = ([0, 0, 128], [255, 25, 255])
+test = ([1, 150, 150], [12, 255, 255])
 
 while True:
     # Capture frame-by-frame
