@@ -33,7 +33,7 @@ def bind_solve_fn(solve_fn):
     @param solve_fn a function that is called when a POST to /solve is registered
     """
 
-    @app.post(f"/solve")
+    @app.route(f"/solve")
     def solve():
         solve_fn()
         return Response(status=200)

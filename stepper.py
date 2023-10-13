@@ -11,12 +11,10 @@ class Direction(Enum):
 
 
 class Motor:
-    dir = Direction.CW
-
     def __init__(self, step_pin: int, dir_pin: int, rpm: int = 300):
         self.step_pin = step_pin
         self.dir_pin = dir_pin
-        set_rpm(rpm)
+        self.set_rpm(rpm)
         
         GPIO.setup(self.step_pin, GPIO.OUT)
         GPIO.setup(self.dir_pin, GPIO.OUT)
@@ -26,9 +24,11 @@ class Motor:
     def __set_direction(self, dir: Direction):
         """
         Sets the direction that the motor will move in
-        @param dir an member of the enum `Direction`
+        @param dir a member of the enum `Direction`
         """
-        GPIO.output(self.dir_pin, dir)
+        self.dir = dir
+        GPIO.output(self.dir_pin, dir.value)
+        time.sleep(0.1)
 
     def __step_delay(self):
         """
@@ -43,16 +43,16 @@ class Motor:
         """
         for _ in range(n_steps):
             GPIO.output(self.step_pin, GPIO.LOW)
-            __step_delay()
-	    GPIO.output(self.step_pin, GPIO.HIGH)
-	    __step_delay()
+            self.__step_delay()
+            GPIO.output(self.step_pin, GPIO.HIGH)
+            self.__step_delay()
 
     def set_rpm(self, rpm: int):
         """
         Set the speed of the motor in RPM (rotations per minute)
         @param rpm the desired # of rotations per minute 
         """
-	    self.rpm = min(1000, max(1, rpm))  
+        self.rpm = min(1000, max(1, rpm)) # clamp between 1 and 1000
 
     def rotate_cw(self):
         """
@@ -69,7 +69,7 @@ class Motor:
 	    """
         if self.dir != Direction.CCW:
             self.__set_direction(Direction.CCW)
-	    self.__move(100)
+        self.__move(100)
     
     def rotate_180(self):
         """
