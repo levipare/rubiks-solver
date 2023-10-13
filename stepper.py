@@ -60,7 +60,7 @@ class Motor:
         """
         if self.dir != Direction.CW:
             self.__set_direction(Direction.CW)
-        self.__move(100)
+        self.__move(50)
 
 
     def rotate_ccw(self):
@@ -69,10 +69,10 @@ class Motor:
 	    """
         if self.dir != Direction.CCW:
             self.__set_direction(Direction.CCW)
-        self.__move(100)
+        self.__move(50)
     
     def rotate_180(self):
         """
         Rotate 180 degrees
         """
-        self.__move(200)
+        self.__move(100)
