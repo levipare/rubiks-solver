@@ -1,5 +1,6 @@
 # import twophase.solver as sv
 # import twophase.cubie as cubie
+import time
 import RPi.GPIO as GPIO
 from camera import CubeCamera
 import web.app
@@ -13,23 +14,31 @@ import stepper
 
 GPIO.setmode(GPIO.BOARD)
 
-# Instantiate motors
+# MOTOR PIN MAPPINGS
+# DO NOT CHANGE
 STEP_1 = 37
 STEP_2 = 33
 STEP_3 = 15
+STEP_4 = 38
+STEP_5 = 32
+STEP_6 = 16
 
 DIR_1 = 35
 DIR_2 = 31
 DIR_3 = 13
+DIR_4 = 40
+DIR_5 = 36
+DIR_6 = 18
 
-motor0 = stepper.Motor(STEP_1, DIR_1, 500)
-motor1 = stepper.Motor(STEP_2, DIR_2, 500)
-motor2 = stepper.Motor(STEP_3, DIR_3, 500)
+motor1 = stepper.Motor(STEP_1, DIR_1)
+motor2 = stepper.Motor(STEP_2, DIR_2)
+motor3 = stepper.Motor(STEP_3, DIR_3, 700)
+motor4 = stepper.Motor(STEP_4, DIR_4)
+motor5 = stepper.Motor(STEP_5, DIR_5)
+motor6 = stepper.Motor(STEP_6, DIR_6)
 
 
-motor0.rotate_cw()
-motor1.rotate_cw()
-motor2.rotate_cw()
+motor3.rotate_180()
 
 
 GPIO.cleanup()
