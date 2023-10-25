@@ -32,7 +32,7 @@ DIR_6 = 18
 
 motor1 = stepper.Motor(STEP_1, DIR_1)
 motor2 = stepper.Motor(STEP_2, DIR_2)
-motor3 = stepper.Motor(STEP_3, DIR_3, 700)
+motor3 = stepper.Motor(STEP_3, DIR_3)
 motor4 = stepper.Motor(STEP_4, DIR_4)
 motor5 = stepper.Motor(STEP_5, DIR_5)
 motor6 = stepper.Motor(STEP_6, DIR_6)
