@@ -2,18 +2,25 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Rubiks</title>
     <script src="static/index.js" defer></script>
+    <link rel="stylesheet" href="static/style.css" />
 </head>
 
 <body>
-    {% for i in range(num_cams) %}
-    <img src="/camera/{{i}}" width="200px">
-    {% endfor %}
+    <div class="cams">
+        <div class="cam-container">
+            <h2>Upper Camera</h2>
+            <img src="/camera/upper" />
+        </div>
+        <div class="cam-container">
+            <h2>Lower Camera</h2>
+            <img src="/camera/lower" />
+        </div>
+    </div>
     <button id="solve-cube">Solve</button>
 </body>
-
 
 </html>

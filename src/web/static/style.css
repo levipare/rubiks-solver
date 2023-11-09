@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans');
+
+:root {
+    --dark-gray: rgb(56, 56, 56);
+    --blue: rgb(57, 115, 223);
+    --dark-blue: rgb(48, 93, 177);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'IBM Plex Sans', sans-serif;
+    color: white;
+}
+
+body {
+    background-color: var(--dark-gray);
+    margin: auto;
+    max-width: 80rem;
+}
+
+#solve-cube {
+    font-size: 1.5rem;
+    background-color: var(--blue);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    margin: 1rem auto 0 auto;
+    display: block;
+}
+
+#solve-cube:hover {
+    cursor: pointer;
+    background-color: var(--dark-blue);
+}
+
+.cams {
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 1rem;
+}
+
+.cam-container h2 {
+    padding-bottom: 0.5rem;
+}
+
+.cam-container img {
+    vertical-align: middle;
+    background-color: grey;
+    border-radius: 0.5rem;
+    width: 600px;
+}

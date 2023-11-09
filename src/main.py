@@ -1,18 +1,9 @@
 # import twophase.solver as sv
 # import twophase.cubie as cubie
-import time
-import RPi.GPIO as GPIO
-from camera import CubeCamera
+#import RPi.GPIO as GPIO
+#import stepper
+from camera import CubeCamera, CubeFace, FaceCaptureGroup
 import web.app
-import stepper
-
-
-# Instantiate first camera and its corresponding web feed
-#camera0 = CubeCamera(0)
-#camera0.capture_frames(threaded=True)
-#web.app.create_camera_feed(camera0.gen_bytes())
-
-GPIO.setmode(GPIO.BOARD)
 
 # MOTOR PIN MAPPINGS
 # DO NOT CHANGE
@@ -30,22 +21,35 @@ DIR_4 = 40
 DIR_5 = 36
 DIR_6 = 18
 
-motor1 = stepper.Motor(STEP_1, DIR_1)
-motor2 = stepper.Motor(STEP_2, DIR_2)
-motor3 = stepper.Motor(STEP_3, DIR_3)
-motor4 = stepper.Motor(STEP_4, DIR_4)
-motor5 = stepper.Motor(STEP_5, DIR_5)
-motor6 = stepper.Motor(STEP_6, DIR_6)
+# TODO: Setup cameras in static position
+# TODO: Create capture groups for each face
+g_up = FaceCaptureGroup(CubeFace.UP, [[(5,5), (200, 200), (260, 250)]])
 
 
-motor3.rotate_180()
+upper_cam = CubeCamera(0, [g_up], True) # start upper camera capture
+web.app.add_camera_feed(upper_cam.gen_bytes(), "upper") # send cam feed to flask app
+
+lower_cam = CubeCamera(1, [g_up], True) 
+web.app.add_camera_feed(lower_cam.gen_bytes(), "lower") 
 
 
-GPIO.cleanup()
+# GPIO.setmode(GPIO.BOARD)
 
-exit(0)
+#motor1 = stepper.Motor(STEP_1, DIR_1)
+#motor2 = stepper.Motor(STEP_2, DIR_2)
+#motor3 = stepper.Motor(STEP_3, DIR_3)
+#motor4 = stepper.Motor(STEP_4, DIR_4)
+#motor5 = stepper.Motor(STEP_5, DIR_5)
+#motor6 = stepper.Motor(STEP_6, DIR_6)
+#
+#
+#motor3.rotate_180()
 
-def solve():
+
+#GPIO.cleanup()
+
+
+def solve() -> bool:
     # cc = cubie.CubieCube()
     # cc.randomize()
     # fc = cc.to_facelet_cube()
@@ -53,6 +57,7 @@ def solve():
     # cubestring = "ULRRUBUBFDRFURBRFLRDLFFRLLDBUBUDDUDBBDFRLULBUDFRLBFDLF"
     # print(sv.solve(cubestring, 20, 1))
     print("solving")
+    return True
 
 # Bind solve to the web app's /solve route
 web.app.bind_solve_fn(solve)

@@ -3,28 +3,23 @@ from flask import Flask, render_template, Response
 app = Flask(__name__)
 
 
-def start():
-    app.run()
+camera_feeds = {}
 
+@app.route("/camera/<key>")
+def feed(key):
+    return Response(
+        camera_feeds[key],
+        mimetype="multipart/x-mixed-replace; boundary=frame",
+    )
 
-camera_count = 0
-
-
-def create_camera_feed(gen):
+def add_camera_feed(gen, key):
     """
-    Creates a camera route that provides a stream of frames given by the provided generator `gen`.
+    Add a new camera feed that can be accessed by its key.
     @param gen a generator yielding frames
+    @param key a unique identifier for the camera feed
     """
-    global camera_count
+    camera_feeds[key] = gen
 
-    @app.route(f"/camera/{camera_count}")
-    def feed():
-        return Response(
-            gen,
-            mimetype="multipart/x-mixed-replace; boundary=frame",
-        )
-
-    camera_count += 1
 
 
 def bind_solve_fn(solve_fn):
@@ -33,15 +28,18 @@ def bind_solve_fn(solve_fn):
     @param solve_fn a function that is called when a POST to /solve is registered
     """
 
-    @app.route(f"/solve")
+    @app.route(f"/solve", methods=["POST"])
     def solve():
-        solve_fn()
-        return Response(status=200)
-
+        return Response(status= 200 if solve_fn() else 500)
+    
 
 @app.route("/")
 def index():
-    return render_template(
-        "index.html",
-        num_cams=camera_count,
-    )
+    return render_template("index.html")
+    
+def start(debug = False):
+    """
+    Start the flask server with option to run in debug mode.
+    """
+    app.debug = debug
+    app.run()
