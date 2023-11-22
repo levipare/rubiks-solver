@@ -64,18 +64,19 @@ motors = [motor1, motor2, motor3, motor4, motor5, motor6]
 #    time.sleep(0.2)
 
 
-color_to_face = {Color.WHITE: CubeFace.UP, Color.YELLOW: CubeFace.DOWN, Color.GREEN: CubeFace.FRONT, Color.BLUE: CubeFace.BACK, Color.GREEN: CubeFace.LEFT, Color.RED: CubeFace.RIGHT}
+color_to_face = {Color.WHITE: CubeFace.UP, Color.YELLOW: CubeFace.DOWN, Color.GREEN: CubeFace.FRONT, Color.BLUE: CubeFace.BACK, Color.ORANGE: CubeFace.LEFT, Color.RED: CubeFace.RIGHT}
 
 def unpack_colors(colors: dict[CubeFace, [Color]]):
-    color_string = ""
+    cube_state = []
     order = [CubeFace.UP, CubeFace.RIGHT, CubeFace.FRONT, CubeFace.DOWN, CubeFace.LEFT, CubeFace.BACK]
     for face in order:
-        for i in range(9):
-                if i == 5:
-                    color_string += face.value
-                else:
-                    color_string += colors[face][i].value if colors[face][i] else " "
-    return color_string
+        for i in range(4):
+            cube_state.append(colors[face][i] if colors[face][i] else " ")
+        cube_state.append(list(color_to_face.keys())[list(color_to_face.values()).index(face)])
+        for i in range(4, 8):
+            cube_state.append(colors[face][i] if colors[face][i] else " ")
+
+    return cube_state
     
 
 
