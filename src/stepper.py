@@ -11,7 +11,7 @@ class Direction(Enum):
 
 
 class Motor:
-    def __init__(self, step_pin: int, dir_pin: int, enable_pin: int, rpm: int = 300):
+    def __init__(self, step_pin: int, dir_pin: int, enable_pin: int, rpm: int = 400):
         self.step_pin = step_pin
         self.dir_pin = dir_pin
         self.enable_pin = enable_pin

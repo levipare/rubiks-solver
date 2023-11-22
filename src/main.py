@@ -4,6 +4,7 @@ import kociemba
 import cv2
 import stepper
 from camera import CubeCamera, CubeFace, FaceCaptureGroup
+from color import Color
 import web.app
 
 # MOTOR PIN MAPPINGS
@@ -29,15 +30,19 @@ EN_4 = 26
 EN_5 = 24
 EN_6 = 10
 
-# TODO: Setup cameras in static position
-# TODO: Create capture groups for each face
-g_up = FaceCaptureGroup(CubeFace.UP, [[(5,5), (200, 200), (260, 250)]])
+g_up = FaceCaptureGroup(CubeFace.UP, [(92,67), (133, 42), (152, 25), (125, 89), (201, 45), (164, 112), (201, 92), (235, 69)])
+g_back = FaceCaptureGroup(CubeFace.BACK, [(75, 92), (108, 117), (141, 143), (80, 126), (141, 180), (80, 151), (115, 187), (142, 208)])
+g_left = FaceCaptureGroup(CubeFace.LEFT, [(178, 149), (216, 124), (248, 103), (175, 185), (242, 135), (172, 214), (203, 191), (245, 158)])
+g_right = FaceCaptureGroup(CubeFace.RIGHT, [(92, 59), (126, 40), (179, 25), (120, 86), (197, 45), (155, 113), (196, 90), (232, 68)])
+g_front = FaceCaptureGroup(CubeFace.FRONT, [(73, 149), (75, 126), (71, 92), (107, 185), (102, 119), (131, 208), (135, 182), (133, 146)])
+g_down = FaceCaptureGroup(CubeFace.DOWN, [(167, 213), (168, 186), (169, 154), (196, 191), (208, 126), (236, 158), (236, 138), (242, 105)])
 
-#upper_cam = CubeCamera(0, [g_up], True) # start upper camera capture
-#web.app.add_camera_feed(upper_cam.gen_bytes(), "upper") # send cam feed to flask app
+upper_cam = CubeCamera(0, [g_up, g_back, g_left], True) # start upper camera capture
+web.app.add_camera_feed(upper_cam.gen_bytes(), "upper") # send cam feed to flask app
 
-#lower_cam = CubeCamera(1, [g_up], True) 
-#web.app.add_camera_feed(lower_cam.gen_bytes(), "lower") 
+lower_cam = CubeCamera(2, [g_right, g_front, g_down], True) 
+web.app.add_camera_feed(lower_cam.gen_bytes(), "lower") 
+
 
 GPIO.setwarnings(False)
 
@@ -50,9 +55,32 @@ motor4 = stepper.Motor(STEP_4, DIR_4, EN_4)
 motor5 = stepper.Motor(STEP_5, DIR_5, EN_5)
 motor6 = stepper.Motor(STEP_6, DIR_6, EN_6)
 
-def solve():
-   # FORMAT: URFDLB
 
+motor1.rotate_180()
+motor1.rotate_180()
+motor1.rotate_180()
+motor1.rotate_180()
+motor1.rotate_180()
+
+color_to_face = {Color.WHITE: CubeFace.UP, Color.YELLOW: CubeFace.DOWN, Color.GREEN: CubeFace.FRONT, Color.BLUE: CubeFace.BACK, Color.GREEN: CubeFace.LEFT, Color.RED: CubeFace.RIGHT}
+
+def unpack_colors(colors: dict[CubeFace, [Color]]):
+    color_string = ""
+    order = [CubeFace.UP, CubeFace.RIGHT, CubeFace.FRONT, CubeFace.DOWN, CubeFace.LEFT, CubeFace.BACK]
+    for face in order:
+        for color in colors[face]:
+                color_string += color.value if color else " "
+    return color_string
+    
+
+
+def solve():
+    print("SOLVING")
+    color_string = unpack_colors(upper_cam.capture_results | lower_cam.capture_results)
+    print(color_string)
+ 
+    # FORMAT: URFDLB
+    return
 
 # Bind solve to the web app's /solve route
 web.app.bind_solve_fn(solve)

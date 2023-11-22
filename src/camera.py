@@ -42,6 +42,10 @@ class CubeCamera:
             print(f"Cannot open camera index: {index}")
             exit()
 
+        self.__cap.set(cv.CAP_PROP_FPS, 10)         
+        self.__cap.set(cv.CAP_PROP_FRAME_WIDTH,320)
+        self.__cap.set(cv.CAP_PROP_FRAME_HEIGHT,240)
+        
         # Handle the threaded capture
         if threaded:
             t = Thread(target=self.__cap_frames)
@@ -72,15 +76,8 @@ class CubeCamera:
                 # reset the last detected color
                 self.capture_results[group.face_name] = []
                 # loop through each facelet of the face
-                for facelet in group.facelets:
-                    detected_color: Color = None
-
-                    # loop through the detection point(s) of each facelet
-                    for point in facelet:
-                        self.capture_results[group.face_name].append(detect_color(frame, point[0], point[1]))
-                    # append the detected color 
-                    self.capture_results[group.face_name].append(detected_color)
- 
+                for point in group.facelets:
+                    self.capture_results[group.face_name].append(detect_color(frame, point[0], point[1])) 
 
             self.__current_frame = frame
 

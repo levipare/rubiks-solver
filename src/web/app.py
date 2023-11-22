@@ -7,10 +7,13 @@ camera_feeds = {}
 
 @app.route("/camera/<key>")
 def feed(key):
-    return Response(
-        camera_feeds[key],
-        mimetype="multipart/x-mixed-replace; boundary=frame",
-    )
+    try:
+        return Response(
+            camera_feeds[key],
+            mimetype="multipart/x-mixed-replace; boundary=frame",
+        )
+    except KeyError:
+        return Response(status=404)
 
 def add_camera_feed(gen, key):
     """

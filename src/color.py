@@ -12,14 +12,15 @@ class Color(Enum):
 
 
 # lower and upper bounds in hsv
-COLOR_LIMITS = {
-    Color.RED: ([170, 80, 80], [255, 255, 255]),
-    Color.GREEN: ([60, 50, 50], [90, 255, 255]),
-    Color.BLUE: ([98, 50, 50], [139, 255, 255]),
-    Color.YELLOW: ([24, 100, 100], [60, 255, 255]),
-    Color.ORANGE: ([2, 150, 150], [12, 255, 255]),
-    Color.WHITE: ([0, 0, 100], [255, 40, 255]),
-}
+COLOR_LIMITS = [
+    (Color.RED, [170, 80, 80], [255, 255, 255]),
+    (Color.RED, [0, 40, 40], [3, 255, 255]),
+    (Color.GREEN, [55, 50, 50], [90, 255, 255]),
+    (Color.BLUE, [98, 50, 60], [139, 255, 255]),
+    (Color.YELLOW, [24, 80, 60], [55, 255, 255]),
+    (Color.ORANGE, [4, 80, 80], [17, 255, 255]),
+    (Color.WHITE, [0, 0, 100], [255, 40, 255]),
+]
 
 # bgr
 COLOR_DISPLAYS = {
@@ -38,9 +39,9 @@ def detect_color(img, x: int, y: int, w=5, h=5) -> Color:
     cell_color: Color = None  # is set when a cube color is detected
     most_non_zero = 0  # tracks the most dominant color in a cell
 
-    for k, v in COLOR_LIMITS.items():
-        lower = np.array(v[0])
-        upper = np.array(v[1])
+    for color in COLOR_LIMITS:
+        lower = np.array(color[1])
+        upper = np.array(color[2])
         mask = cv.inRange(cell_hsv, lower, upper)
         masked = cv.bitwise_and(cell_hsv, cell_hsv, mask=mask)
         flattened = masked.flatten()
@@ -48,7 +49,7 @@ def detect_color(img, x: int, y: int, w=5, h=5) -> Color:
 
         if non_zero > most_non_zero and non_zero > flattened.size * 0.2:
             most_non_zero = non_zero
-            cell_color = k
+            cell_color = color[0]
             cell_hsv = masked
 
     # Draw the masked image to its cell
