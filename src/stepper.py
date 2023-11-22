@@ -6,18 +6,22 @@ STEPS_PER_REV = 200
 SECONDS = 60
 
 class Direction(Enum):
-    CW = 1
-    CCW = 0
+    CW = 0
+    CCW = 1
 
 
 class Motor:
-    def __init__(self, step_pin: int, dir_pin: int, rpm: int = 300):
+    def __init__(self, step_pin: int, dir_pin: int, enable_pin: int, rpm: int = 300):
         self.step_pin = step_pin
         self.dir_pin = dir_pin
+        self.enable_pin = enable_pin
         self.set_rpm(rpm)
         
         GPIO.setup(self.step_pin, GPIO.OUT)
         GPIO.setup(self.dir_pin, GPIO.OUT)
+        GPIO.setup(self.enable_pin, GPIO.OUT)
+
+        GPIO.output(self.enable_pin, GPIO.HIGH)
 
         self.__set_direction(Direction.CW)
 
@@ -41,11 +45,15 @@ class Motor:
         Moves the Motor `n_steps`
         @param n_steps the number of steps to move the motor
         """
+        # Enable Motor
+        GPIO.output(self.enable_pin, GPIO.LOW)
         for _ in range(n_steps):
             GPIO.output(self.step_pin, GPIO.LOW)
             self.__step_delay()
             GPIO.output(self.step_pin, GPIO.HIGH)
             self.__step_delay()
+	# Disable Motor
+        GPIO.output(self.enable_pin, GPIO.HIGH)
 
     def set_rpm(self, rpm: int):
         """

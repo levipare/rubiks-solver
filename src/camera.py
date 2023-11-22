@@ -37,7 +37,7 @@ class CubeCamera:
         self.__capture_groups: [FaceCaptureGroup] = capture_groups
 
         # Launch video capture
-        self.__cap = cv.VideoCapture(index, cv.CAP_DSHOW)
+        self.__cap = cv.VideoCapture(index)
         if not self.__cap.isOpened():
             print(f"Cannot open camera index: {index}")
             exit()

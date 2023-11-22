@@ -42,4 +42,4 @@ def start(debug = False):
     Start the flask server with option to run in debug mode.
     """
     app.debug = debug
-    app.run()
+    app.run(host='0.0.0.0', port=5000)
