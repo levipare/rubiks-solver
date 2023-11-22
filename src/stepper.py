@@ -1,5 +1,6 @@
-import RPi.GPIO as GPIO
+import atexit
 import time
+import RPi.GPIO as GPIO
 from enum import Enum
 
 STEPS_PER_REV = 200
@@ -11,7 +12,7 @@ class Direction(Enum):
 
 
 class Motor:
-    def __init__(self, step_pin: int, dir_pin: int, enable_pin: int, rpm: int = 400):
+    def __init__(self, step_pin: int, dir_pin: int, enable_pin: int, rpm: int = 200):
         self.step_pin = step_pin
         self.dir_pin = dir_pin
         self.enable_pin = enable_pin
@@ -22,6 +23,8 @@ class Motor:
         GPIO.setup(self.enable_pin, GPIO.OUT)
 
         GPIO.output(self.enable_pin, GPIO.HIGH)
+        
+        atexit.register(GPIO.output, self.enable_pin, GPIO.HIGH)
 
         self.__set_direction(Direction.CW)
 

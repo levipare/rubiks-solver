@@ -56,11 +56,13 @@ motor5 = stepper.Motor(STEP_5, DIR_5, EN_5)
 motor6 = stepper.Motor(STEP_6, DIR_6, EN_6)
 
 
-motor1.rotate_180()
-motor1.rotate_180()
-motor1.rotate_180()
-motor1.rotate_180()
-motor1.rotate_180()
+motors = [motor1, motor2, motor3, motor4, motor5, motor6]
+#import random
+#for _ in range(20):
+#    m = random.choice(motors)
+#    m.rotate_cw()
+#    time.sleep(0.2)
+
 
 color_to_face = {Color.WHITE: CubeFace.UP, Color.YELLOW: CubeFace.DOWN, Color.GREEN: CubeFace.FRONT, Color.BLUE: CubeFace.BACK, Color.GREEN: CubeFace.LEFT, Color.RED: CubeFace.RIGHT}
 
@@ -68,8 +70,11 @@ def unpack_colors(colors: dict[CubeFace, [Color]]):
     color_string = ""
     order = [CubeFace.UP, CubeFace.RIGHT, CubeFace.FRONT, CubeFace.DOWN, CubeFace.LEFT, CubeFace.BACK]
     for face in order:
-        for color in colors[face]:
-                color_string += color.value if color else " "
+        for i in range(9):
+                if i == 5:
+                    color_string += face.value
+                else:
+                    color_string += colors[face][i].value if colors[face][i] else " "
     return color_string
     
 

@@ -14,7 +14,7 @@ class Color(Enum):
 # lower and upper bounds in hsv
 COLOR_LIMITS = [
     (Color.RED, [170, 80, 80], [255, 255, 255]),
-    (Color.RED, [0, 40, 40], [3, 255, 255]),
+    (Color.RED, [0, 30, 40], [3, 255, 255]),
     (Color.GREEN, [55, 50, 50], [90, 255, 255]),
     (Color.BLUE, [98, 50, 60], [139, 255, 255]),
     (Color.YELLOW, [24, 80, 60], [55, 255, 255]),
