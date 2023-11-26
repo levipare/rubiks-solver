@@ -13,13 +13,13 @@ class Color(Enum):
 
 # lower and upper bounds in hsv
 COLOR_LIMITS = [
-    (Color.RED, [170, 80, 80], [255, 255, 255]),
+    (Color.RED, [170, 80, 60], [255, 255, 255]),
     (Color.RED, [0, 30, 40], [3, 255, 255]),
-    (Color.GREEN, [55, 50, 50], [90, 255, 255]),
-    (Color.BLUE, [98, 50, 60], [139, 255, 255]),
+    (Color.GREEN, [55, 50, 30], [90, 255, 255]),
+    (Color.BLUE, [98, 140, 50], [139, 255, 255]),
     (Color.YELLOW, [24, 80, 60], [55, 255, 255]),
-    (Color.ORANGE, [4, 80, 80], [17, 255, 255]),
-    (Color.WHITE, [0, 0, 100], [255, 40, 255]),
+    (Color.ORANGE, [4, 90, 80], [17, 255, 255]),
+    (Color.WHITE, [0, 0, 30], [255, 100, 255]),
 ]
 
 # bgr
@@ -34,7 +34,7 @@ COLOR_DISPLAYS = {
 
 
 # https://learnopencv.com/color-spaces-in-opencv-cpp-python/
-def detect_color(img, x: int, y: int, w=5, h=5) -> Color:
+def detect_color(img, id: int, x: int, y: int, w=5, h=5) -> Color:
     cell_hsv = cv.cvtColor(img[y : y + h, x : x + w], cv.COLOR_BGR2HSV)
     cell_color: Color = None  # is set when a cube color is detected
     most_non_zero = 0  # tracks the most dominant color in a cell
@@ -62,5 +62,5 @@ def detect_color(img, x: int, y: int, w=5, h=5) -> Color:
         COLOR_DISPLAYS[cell_color] if cell_color else (0, 0, 0),
         -1,
     )
-
+    cv.putText(img, str(id), (x, y), cv.FONT_HERSHEY_SIMPLEX, 0.25, (255,255,255), 1, cv.LINE_AA, False)
     return cell_color

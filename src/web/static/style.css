@@ -4,6 +4,10 @@
     --dark-gray: rgb(56, 56, 56);
     --blue: rgb(57, 115, 223);
     --dark-blue: rgb(48, 93, 177);
+    --green: rgb(12, 188, 0);
+    --dark-green: rgb(21, 144, 13);
+    --red: rgb(166, 22, 22);
+    --dark-red: rgb(120, 16, 16)
 }
 
 * {
@@ -20,19 +24,53 @@ body {
     max-width: 80rem;
 }
 
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+}
+
 #solve-cube {
     font-size: 1.5rem;
-    background-color: var(--blue);
+    background-color: var(--green);
     border: none;
     border-radius: 0.5rem;
     padding: 0.5rem 1rem;
-    margin: 1rem auto 0 auto;
     display: block;
 }
 
 #solve-cube:hover {
     cursor: pointer;
+    background-color: var(--dark-green);
+}
+
+#scramble-cube {
+    font-size: 1.5rem;
+    background-color: var(--blue);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    display: block;
+}
+
+#scramble-cube:hover {
+    cursor: pointer;
     background-color: var(--dark-blue);
+}
+
+#abort {
+    font-size: 1.5rem;
+    background-color: var(--red);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    display: block;
+}
+
+#abort:hover {
+    cursor: pointer;
+    background-color: var(--dark-red);
 }
 
 .cams {

@@ -7,12 +7,12 @@ STEPS_PER_REV = 200
 SECONDS = 60
 
 class Direction(Enum):
-    CW = 0
-    CCW = 1
+    CCW = 0 
+    CW = 1
 
 
 class Motor:
-    def __init__(self, step_pin: int, dir_pin: int, enable_pin: int, rpm: int = 200):
+    def __init__(self, step_pin: int, dir_pin: int, enable_pin: int, rpm: int = 400):
         self.step_pin = step_pin
         self.dir_pin = dir_pin
         self.enable_pin = enable_pin

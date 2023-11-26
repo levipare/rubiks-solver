@@ -41,7 +41,7 @@ class CubeCamera:
         if not self.__cap.isOpened():
             print(f"Cannot open camera index: {index}")
             exit()
-
+        self.__cap.set(cv.CAP_PROP_BRIGHTNESS, 120)
         self.__cap.set(cv.CAP_PROP_FPS, 10)         
         self.__cap.set(cv.CAP_PROP_FRAME_WIDTH,320)
         self.__cap.set(cv.CAP_PROP_FRAME_HEIGHT,240)
@@ -74,10 +74,11 @@ class CubeCamera:
             # loop through all faces associated with the camera
             for group in self.__capture_groups:
                 # reset the last detected color
-                self.capture_results[group.face_name] = []
-                # loop through each facelet of the face
-                for point in group.facelets:
-                    self.capture_results[group.face_name].append(detect_color(frame, point[0], point[1])) 
+                if group.face_name not in self.capture_results:
+                    self.capture_results[group.face_name] = [None for _ in range(8)]
+                # loop through each facelet of the face 
+                for i in range(8):
+                    self.capture_results[group.face_name][i] = detect_color(frame, i, group.facelets[i][0], group.facelets[i][1]) 
 
             self.__current_frame = frame
 
