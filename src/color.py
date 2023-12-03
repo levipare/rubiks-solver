@@ -34,7 +34,7 @@ COLOR_DISPLAYS = {
 
 
 # https://learnopencv.com/color-spaces-in-opencv-cpp-python/
-def detect_color(img, id: int, x: int, y: int, w=5, h=5) -> Color:
+def detect_color(img, id: int, x: int, y: int, w=4, h=4) -> Color:
     cell_hsv = cv.cvtColor(img[y : y + h, x : x + w], cv.COLOR_BGR2HSV)
     cell_color: Color = None  # is set when a cube color is detected
     most_non_zero = 0  # tracks the most dominant color in a cell

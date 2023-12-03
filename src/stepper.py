@@ -35,7 +35,7 @@ class Motor:
         """
         self.dir = dir
         GPIO.output(self.dir_pin, dir.value)
-        time.sleep(0.1)
+        time.sleep(0.01)
 
     def __step_delay(self):
         """

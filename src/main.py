@@ -32,17 +32,17 @@ EN_6 = 10
 
 
 # Setup cameras
-g_up = FaceCaptureGroup(CubeFace.UP, [(164, 112), (125, 89), (92, 67), (201, 92), (133, 42), (235, 69), (201, 45), (152, 25)])
-g_back = FaceCaptureGroup(CubeFace.BACK, [(75, 92), (108, 117), (141, 143), (80, 126), (141, 180), (80, 151), (115, 187), (142, 208)])
-g_left = FaceCaptureGroup(CubeFace.LEFT, [(178, 149), (216, 124), (248, 103), (175, 185), (242, 135), (172, 214), (203, 191), (245, 158)])
-g_right = FaceCaptureGroup(CubeFace.RIGHT, [(92, 59), (126, 40), (179, 25), (120, 86), (197, 45), (155, 113), (196, 90), (232, 68)])
-g_front = FaceCaptureGroup(CubeFace.FRONT, [(73, 149), (75, 126), (71, 92), (107, 185), (102, 119), (131, 208), (135, 182), (133, 146)])
-g_down = FaceCaptureGroup(CubeFace.DOWN, [(167, 213), (168, 186), (169, 154), (196, 191), (208, 126), (236, 158), (236, 138), (242, 105)])
+g_up = FaceCaptureGroup(CubeFace.UP, [(159, 119), (120, 90), (89, 64), (194, 95), (126, 49), (224, 70), (190, 48), (144, 31)])
+g_back = FaceCaptureGroup(CubeFace.BACK, [(72, 99), (100, 120), (134, 147), (75, 131), (135, 180), (76, 154), (106, 186), (132, 208)])
+g_left = FaceCaptureGroup(CubeFace.LEFT, [(175, 150), (212, 127), (243, 105), (172, 186), (239, 139), (170, 217), (200, 194), (239, 161)])
+g_right = FaceCaptureGroup(CubeFace.RIGHT, [(80, 59), (119, 40), (139, 23), (111, 82), (185, 42), (150, 110), (186, 86), (217, 62)])
+g_front = FaceCaptureGroup(CubeFace.FRONT, [(68, 149), (69, 125), (65, 92), (100, 178), (95, 111), (132, 203), (130, 176), (128, 143)])
+g_down = FaceCaptureGroup(CubeFace.DOWN, [(170, 210), (168, 181), (170, 147), (199, 185), (205, 120), (233, 155), (233, 130), (239, 96)])
 
-upper_cam = CubeCamera(2, [g_up, g_back, g_left], True)
+upper_cam = CubeCamera(0, [g_up, g_back, g_left], True)
 web.app.add_camera_feed(upper_cam.gen_bytes(), "upper")
 
-lower_cam = CubeCamera(0, [g_down, g_front, g_right], True) 
+lower_cam = CubeCamera(2, [g_down, g_front, g_right], True) 
 web.app.add_camera_feed(lower_cam.gen_bytes(), "lower") 
 
 # Setup motors
@@ -61,6 +61,10 @@ motor6 = stepper.Motor(STEP_6, DIR_6, EN_6)
 face_to_motor = {CubeFace.UP: motor6, CubeFace.DOWN: motor2, CubeFace.FRONT: motor3, CubeFace.BACK: motor4, CubeFace.LEFT: motor5, CubeFace.RIGHT: motor1}
 color_to_face = {Color.WHITE: CubeFace.UP, Color.YELLOW: CubeFace.DOWN, Color.GREEN: CubeFace.FRONT, Color.BLUE: CubeFace.BACK, Color.ORANGE: CubeFace.LEFT, Color.RED: CubeFace.RIGHT}
 
+#motors = [motor1, motor2, motor3, motor4, motor5, motor6]
+#for motor in motors:
+#    motor.rotate_180()
+#    time.sleep(1)
 
 def unpack_colors(colors: dict[CubeFace, [Color]]):
     """
@@ -82,6 +86,7 @@ def unpack_colors(colors: dict[CubeFace, [Color]]):
 abort_flag = False  
 
 def solve() -> bool:
+    time = start.now()
     cube_state = unpack_colors(upper_cam.capture_results | lower_cam.capture_results)
     cube_string = ""
     for color in cube_state:
@@ -112,7 +117,8 @@ def solve() -> bool:
             print(f"{face} clockwise 180")
             face_to_motor[face].rotate_180()
             i += 3
-        time.sleep(0.2)
+        time.sleep(0.1)
+    print(f'Solved in {start - time.now()}s')
     return True
 
 
@@ -123,8 +129,9 @@ def scramble():
         if abort_flag:
             abort_flag = False
             return
-        random.choice(motors).rotate_cw() 
-        time.sleep(0.1)
+        m = random.choice(motors)
+        random.choice([m.rotate_cw, m.rotate_ccw, m.rotate_180])()
+        time.sleep(0.05)
     return
 
 
