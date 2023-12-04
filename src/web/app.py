@@ -1,5 +1,4 @@
-from flask import Flask, render_template, Response
-
+from flask import Flask, render_template, Response, jsonify, request
 app = Flask(__name__)
 
 
@@ -33,7 +32,9 @@ def bind_solve_fn(solve_fn):
 
     @app.route(f"/solve", methods=["POST"])
     def solve():
-        return Response(status= 200 if solve_fn() else 500)
+        data = request.get_json(force=True)
+        print(data)
+        return Response(status= 200 if solve_fn(data['state'] or None) else 500)
 
 
 def bind_scramble_fn(scramble_fn):
@@ -55,6 +56,11 @@ def bind_abort_fn(abort_fn):
     @app.route(f"/abort", methods=["POST"])
     def abort():
         return Response(status= 200 if abort_fn() else 500)
+
+def bind_state_fn(get_state):
+    @app.route("/state", methods=["GET"])
+    def state():
+        return jsonify({"state": get_state()})
 
 @app.route("/")
 def index():

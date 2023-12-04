@@ -33,10 +33,10 @@ EN_6 = 10
 
 # Setup cameras
 g_up = FaceCaptureGroup(CubeFace.UP, [(159, 119), (120, 90), (89, 64), (194, 95), (126, 49), (224, 70), (190, 48), (144, 31)])
-g_back = FaceCaptureGroup(CubeFace.BACK, [(72, 99), (100, 120), (134, 147), (75, 131), (135, 180), (76, 154), (106, 186), (132, 208)])
+g_back = FaceCaptureGroup(CubeFace.BACK, [(72, 99), (100, 120), (134, 147), (75, 131), (135, 180), (76, 157), (106, 186), (132, 208)])
 g_left = FaceCaptureGroup(CubeFace.LEFT, [(175, 150), (212, 127), (243, 105), (172, 186), (239, 139), (170, 217), (200, 194), (239, 161)])
-g_right = FaceCaptureGroup(CubeFace.RIGHT, [(80, 59), (119, 40), (139, 23), (111, 82), (185, 42), (150, 110), (186, 86), (217, 62)])
-g_front = FaceCaptureGroup(CubeFace.FRONT, [(68, 149), (69, 125), (65, 92), (100, 178), (95, 111), (132, 203), (130, 176), (128, 143)])
+g_right = FaceCaptureGroup(CubeFace.RIGHT, [(80, 59), (119, 40), (173, 20), (111, 82), (185, 42), (150, 110), (186, 86), (217, 62)])
+g_front = FaceCaptureGroup(CubeFace.FRONT, [(72, 146), (69, 125), (65, 92), (100, 178), (95, 111), (132, 203), (130, 176), (128, 143)])
 g_down = FaceCaptureGroup(CubeFace.DOWN, [(170, 210), (168, 181), (170, 147), (199, 185), (205, 120), (233, 155), (233, 130), (239, 96)])
 
 upper_cam = CubeCamera(0, [g_up, g_back, g_left], True)
@@ -61,12 +61,7 @@ motor6 = stepper.Motor(STEP_6, DIR_6, EN_6)
 face_to_motor = {CubeFace.UP: motor6, CubeFace.DOWN: motor2, CubeFace.FRONT: motor3, CubeFace.BACK: motor4, CubeFace.LEFT: motor5, CubeFace.RIGHT: motor1}
 color_to_face = {Color.WHITE: CubeFace.UP, Color.YELLOW: CubeFace.DOWN, Color.GREEN: CubeFace.FRONT, Color.BLUE: CubeFace.BACK, Color.ORANGE: CubeFace.LEFT, Color.RED: CubeFace.RIGHT}
 
-#motors = [motor1, motor2, motor3, motor4, motor5, motor6]
-#for motor in motors:
-#    motor.rotate_180()
-#    time.sleep(1)
-
-def unpack_colors(colors: dict[CubeFace, [Color]]):
+def unpack_colors(colors: dict[CubeFace, [Color]]) -> [Color]:
     """
     Takes the camera output and converts into an array of colors in the order specified by the kociemba algo.
     @param colors The output of the camera's color detection
@@ -82,19 +77,36 @@ def unpack_colors(colors: dict[CubeFace, [Color]]):
 
     return cube_state
 
+def color_lit_to_enum(colors: str) -> [Color]:
+    ce = []
+    for c in colors:
+        ce.append(Color(c))
+    return ce     
+
+def get_state_str():
+    cube_state = unpack_colors(upper_cam.capture_results | lower_cam.capture_results)
+    s = ""
+    for c in cube_state:
+        s += c.value if c else ' '
+    return s
+
 # Used to abort solves/scrambles
 abort_flag = False  
 
-def solve() -> bool:
-    time = start.now()
-    cube_state = unpack_colors(upper_cam.capture_results | lower_cam.capture_results)
+def solve(color_string: str = None) -> bool:
+    start = time.time()
+    cube_state = unpack_colors(upper_cam.capture_results | lower_cam.capture_results)    
     cube_string = ""
-    for color in cube_state:
-        cube_string += color_to_face[color].value
+    if color_string:
+        for color in color_lit_to_enum(color_string):
+            cube_string += color_to_face[color].value
+    else:
+        for color in cube_state:
+            cube_string += color_to_face[color].value
     try:    
         moves = kociemba.solve(cube_string)
     except:
-        print("Invalid cube string!")
+        print(f"Invalid cube string! {cube_string}")
         return False
     
     i = 0
@@ -103,7 +115,7 @@ def solve() -> bool:
         if abort_flag:
             abort_flag = False
             return False
-        face = next(member for member in CubeFace.__members__.values() if member.value == moves[i])              
+        face = CubeFace(moves[i])              
 
         if i == (len(moves) - 1) or moves[i + 1] == ' ':
             print(f"{face} clockwise")
@@ -117,8 +129,8 @@ def solve() -> bool:
             print(f"{face} clockwise 180")
             face_to_motor[face].rotate_180()
             i += 3
-        time.sleep(0.1)
-    print(f'Solved in {start - time.now()}s')
+        time.sleep(0.01)
+    print(f'Solved in {time.time() - start:.2f}s')
     return True
 
 
@@ -131,7 +143,7 @@ def scramble():
             return
         m = random.choice(motors)
         random.choice([m.rotate_cw, m.rotate_ccw, m.rotate_180])()
-        time.sleep(0.05)
+        time.sleep(0.01)
     return
 
 
@@ -144,6 +156,7 @@ def abort():
 web.app.bind_solve_fn(solve)
 web.app.bind_scramble_fn(scramble)
 web.app.bind_abort_fn(abort)
+web.app.bind_state_fn(get_state_str)
 
 # Start flask server
 web.app.start()

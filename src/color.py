@@ -13,13 +13,13 @@ class Color(Enum):
 
 # lower and upper bounds in hsv
 COLOR_LIMITS = [
-    (Color.RED, [170, 80, 60], [255, 255, 255]),
-    (Color.RED, [0, 30, 40], [3, 255, 255]),
+    (Color.RED, [170, 70, 60], [255, 255, 255]),
+    (Color.RED, [0, 70, 60], [4, 255, 255]),
     (Color.GREEN, [55, 50, 30], [90, 255, 255]),
-    (Color.BLUE, [98, 140, 50], [139, 255, 255]),
-    (Color.YELLOW, [24, 80, 60], [55, 255, 255]),
-    (Color.ORANGE, [4, 90, 80], [20, 255, 255]),
-    (Color.WHITE, [0, 0, 30], [255, 100, 255]),
+    (Color.BLUE, [98, 100, 100], [139, 255, 255]),
+    (Color.YELLOW, [24, 10, 60], [55, 255, 255]),
+    (Color.ORANGE, [0, 0, 0], [255, 50, 50]),
+    (Color.WHITE, [0, 0, 70], [255, 70, 255]),
 ]
 
 # bgr
@@ -36,7 +36,7 @@ COLOR_DISPLAYS = {
 # https://learnopencv.com/color-spaces-in-opencv-cpp-python/
 def detect_color(img, id: int, x: int, y: int, w=4, h=4) -> Color:
     cell_hsv = cv.cvtColor(img[y : y + h, x : x + w], cv.COLOR_BGR2HSV)
-    cell_color: Color = None  # is set when a cube color is detected
+    cell_color: Color = Color.ORANGE # is set when a cube color is detected
     most_non_zero = 0  # tracks the most dominant color in a cell
 
     for color in COLOR_LIMITS:
@@ -46,21 +46,11 @@ def detect_color(img, id: int, x: int, y: int, w=4, h=4) -> Color:
         masked = cv.bitwise_and(cell_hsv, cell_hsv, mask=mask)
         flattened = masked.flatten()
         non_zero = np.count_nonzero(flattened)
+        
 
         if non_zero > most_non_zero and non_zero > flattened.size * 0.2:
             most_non_zero = non_zero
             cell_color = color[0]
-            cell_hsv = masked
+         
 
-    # Draw the masked image to its cell
-    img[y : y + h, x : x + w] = cv.cvtColor(cell_hsv, cv.COLOR_HSV2BGR)
-
-    cv.rectangle(
-        img,
-        (x, y),
-        (x + w, y + h),
-        COLOR_DISPLAYS[cell_color] if cell_color else (0, 0, 0),
-        -1,
-    )
-    cv.putText(img, str(id), (x, y), cv.FONT_HERSHEY_SIMPLEX, 0.25, (255,255,255), 1, cv.LINE_AA, False)
     return cell_color

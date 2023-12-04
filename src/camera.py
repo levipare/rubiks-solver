@@ -3,7 +3,7 @@ from enum import Enum
 from threading import Thread
 import time
 
-from color import Color, detect_color
+from color import Color, detect_color, COLOR_DISPLAYS
 
 class CubeFace(Enum):
     UP = "U"
@@ -15,7 +15,7 @@ class CubeFace(Enum):
 
 class FaceCaptureGroup:
     
-    def __init__(self, face_name: CubeFace, facelets: [[(int, int)]]):
+    def __init__(self, face_name: CubeFace, facelets: [(int, int)]):
         """
         @param face_name The face identifier of the capture group
         @param facelets is a list containing 9 sublists that represent the 1-9 facelets of a rubik's cube face.
@@ -36,12 +36,15 @@ class CubeCamera:
         # Store the provided groups based off their face name
         self.__capture_groups: [FaceCaptureGroup] = capture_groups
 
+
+        # reset the last detected color
+        for group in self.__capture_groups:
+            self.capture_results[group.face_name] = [None for _ in range(8)]
         # Launch video capture
         self.__cap = cv.VideoCapture(index)
         if not self.__cap.isOpened():
             print(f"Cannot open camera index: {index}")
             exit()
-        self.__cap.set(cv.CAP_PROP_BRIGHTNESS, 120)
         self.__cap.set(cv.CAP_PROP_FPS, 10)         
         self.__cap.set(cv.CAP_PROP_FRAME_WIDTH,320)
         self.__cap.set(cv.CAP_PROP_FRAME_HEIGHT,240)
@@ -73,13 +76,16 @@ class CubeCamera:
             
             # loop through all faces associated with the camera
             for group in self.__capture_groups:
-                # reset the last detected color
-                if group.face_name not in self.capture_results:
-                    self.capture_results[group.face_name] = [None for _ in range(8)]
                 # loop through each facelet of the face 
                 for i in range(8):
-                    self.capture_results[group.face_name][i] = detect_color(frame, i, group.facelets[i][0], group.facelets[i][1]) 
-
+                    x = group.facelets[i][0]
+                    y = group.facelets[i][1]
+                    detection = detect_color(frame, i, x, y) 
+                    if detection:
+                        self.capture_results[group.face_name][i] = detection
+                        
+                    cv.rectangle(frame, (x, y), (x + 4, y + 4), COLOR_DISPLAYS[self.capture_results[group.face_name][i]] if self.capture_results[group.face_name][i] else (0,0,0),-1)
+                    cv.putText(frame, str(i), (x, y), cv.FONT_HERSHEY_SIMPLEX, 0.25, (255,255,255), 1, cv.LINE_AA, False)
             self.__current_frame = frame
 
     
