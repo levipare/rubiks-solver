@@ -14,11 +14,10 @@ class Color(Enum):
 # lower and upper bounds in hsv
 COLOR_LIMITS = [
     (Color.RED, [170, 70, 60], [255, 255, 255]),
-    (Color.RED, [0, 70, 60], [4, 255, 255]),
     (Color.GREEN, [55, 50, 30], [90, 255, 255]),
     (Color.BLUE, [98, 100, 100], [139, 255, 255]),
-    (Color.YELLOW, [24, 10, 60], [55, 255, 255]),
-    (Color.ORANGE, [0, 0, 0], [255, 60, 60]),
+    (Color.YELLOW, [24, 10, 60], [55, 255, 255]), 
+    (Color.ORANGE, [4, 70, 80], [17, 255, 255]),
     (Color.WHITE, [0, 0, 80], [255, 70, 255]),
 ]
 
@@ -36,7 +35,7 @@ COLOR_DISPLAYS = {
 # https://learnopencv.com/color-spaces-in-opencv-cpp-python/
 def detect_color(img, id: int, x: int, y: int, w=4, h=4) -> Color:
     cell_hsv = cv.cvtColor(img[y : y + h, x : x + w], cv.COLOR_BGR2HSV)
-    cell_color: Color = Color.ORANGE # is set when a cube color is detected
+    cell_color: Color = None # is set when a cube color is detected
     most_non_zero = 0  # tracks the most dominant color in a cell
 
     for color in COLOR_LIMITS:

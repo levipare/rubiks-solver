@@ -39,10 +39,12 @@ g_right = FaceCaptureGroup(CubeFace.RIGHT, [(80, 59), (119, 40), (173, 20), (111
 g_front = FaceCaptureGroup(CubeFace.FRONT, [(72, 146), (69, 125), (65, 92), (100, 178), (95, 111), (132, 203), (130, 176), (128, 143)])
 g_down = FaceCaptureGroup(CubeFace.DOWN, [(170, 210), (168, 181), (170, 147), (199, 185), (205, 120), (233, 155), (233, 130), (239, 96)])
 
-upper_cam = CubeCamera(0, [g_up, g_back, g_left], True)
+g_one = FaceCaptureGroup(CubeFace.FRONT, [(71, 92), (97, 111), (131, 143)])
+
+upper_cam = CubeCamera(0, [], True)
 web.app.add_camera_feed(upper_cam.gen_bytes(), "upper")
 
-lower_cam = CubeCamera(2, [g_down, g_front, g_right], True) 
+lower_cam = CubeCamera(2, [g_one], True) 
 web.app.add_camera_feed(lower_cam.gen_bytes(), "lower") 
 
 # Setup motors
@@ -90,25 +92,273 @@ def get_state_str():
         s += c.value if c else ' '
     return s
 
+def turn_to_get_state() -> [Color]:
+    delay = 1
+    UP = face_to_motor[CubeFace.UP]
+    DOWN = face_to_motor[CubeFace.DOWN]
+    LEFT = face_to_motor[CubeFace.LEFT]
+    RIGHT = face_to_motor[CubeFace.RIGHT]
+    FRONT = face_to_motor[CubeFace.FRONT]
+    BACK = face_to_motor[CubeFace.BACK]
+
+    # Up scanning
+    up_state = [None for _ in range(9)]
+    up_state[4] = Color.WHITE
+    RIGHT.rotate_ccw()
+    time.sleep(delay)
+    (up_state[2], up_state[5], up_state[8]) = lower_cam.capture_results[CubeFace.FRONT]
+    RIGHT.rotate_cw()
+    time.sleep(0.05)
+    UP.rotate_cw()
+    time.sleep(0.05)
+    RIGHT.rotate_ccw()
+    time.sleep(delay)
+    up_state[0] = lower_cam.capture_results[CubeFace.FRONT][0]
+    up_state[1] = lower_cam.capture_results[CubeFace.FRONT][1]
+    RIGHT.rotate_cw()
+    time.sleep(0.05) 
+    UP.rotate_cw()
+    time.sleep(0.05)
+    RIGHT.rotate_ccw()
+    time.sleep(delay)    
+    up_state[3] = lower_cam.capture_results[CubeFace.FRONT][1]
+    up_state[6] = lower_cam.capture_results[CubeFace.FRONT][0]
+    RIGHT.rotate_cw()
+    time.sleep(0.05) 
+    UP.rotate_cw()
+    time.sleep(0.05)
+    RIGHT.rotate_ccw()
+    time.sleep(delay)
+    up_state[7] = lower_cam.capture_results[CubeFace.FRONT][1]
+    RIGHT.rotate_cw()
+    time.sleep(0.05)
+    UP.rotate_cw()
+
+    # Right scanning
+    right_state = [None for _ in range(9)]
+    right_state[4] = Color.RED
+    time.sleep(delay)    
+    UP.rotate_cw()
+    time.sleep(0.05)
+    FRONT.rotate_cw()
+    time.sleep(delay)
+    
+    (right_state[0], right_state[1], right_state[2]) = lower_cam.capture_results[CubeFace.FRONT]
+    FRONT.rotate_ccw()
+    time.sleep(0.05)
+    UP.rotate_ccw()   
+    time.sleep(0.05)
+    RIGHT.rotate_cw()
+    
+    UP.rotate_cw()
+    time.sleep(0.05)
+    FRONT.rotate_cw()
+    time.sleep(delay)
+ 
+    right_state[6] = lower_cam.capture_results[CubeFace.FRONT][0]
+    right_state[3] = lower_cam.capture_results[CubeFace.FRONT][1]
+    FRONT.rotate_ccw()
+    time.sleep(0.05)
+    UP.rotate_ccw()   
+    time.sleep(0.05)
+    RIGHT.rotate_cw()
+    time.sleep(0.05)
+    UP.rotate_cw()
+    time.sleep(0.05)
+    FRONT.rotate_cw()
+    time.sleep(delay)
+    right_state[8] = lower_cam.capture_results[CubeFace.FRONT][0]
+    right_state[7] = lower_cam.capture_results[CubeFace.FRONT][1]
+    FRONT.rotate_ccw()
+    time.sleep(0.05)
+    UP.rotate_ccw()   
+    time.sleep(0.05)
+    RIGHT.rotate_cw()
+    time.sleep(0.05)
+    UP.rotate_cw()
+    time.sleep(0.05)
+    FRONT.rotate_cw()
+    time.sleep(delay)
+    right_state[5] = lower_cam.capture_results[CubeFace.FRONT][1]
+    FRONT.rotate_ccw()
+    time.sleep(0.05)
+    UP.rotate_ccw()   
+    time.sleep(0.05)
+    RIGHT.rotate_cw()
+
+   
+    # Front scanning
+    front_state = [None for _ in range(9)]
+    front_state[4] = Color.GREEN
+    
+    time.sleep(delay)    
+    (front_state[2], front_state[5], front_state[8]) = lower_cam.capture_results[CubeFace.FRONT]
+    FRONT.rotate_cw()
+    time.sleep(delay)
+    front_state[0] = lower_cam.capture_results[CubeFace.FRONT][0] 
+    front_state[1] = lower_cam.capture_results[CubeFace.FRONT][1]
+    FRONT.rotate_cw()
+    time.sleep(delay)
+    front_state[6] = lower_cam.capture_results[CubeFace.FRONT][0] 
+    front_state[3] = lower_cam.capture_results[CubeFace.FRONT][1]
+    FRONT.rotate_cw()
+    time.sleep(delay)
+    front_state[7] = lower_cam.capture_results[CubeFace.FRONT][1] 
+    FRONT.rotate_cw()
+
+    # Down scanning
+    down_state = [None for _ in range(9)]
+    down_state[4] = Color.YELLOW
+    time.sleep(delay) 
+    RIGHT.rotate_cw()
+    time.sleep(delay) 
+    (down_state[2], down_state[5], down_state[8]) = lower_cam.capture_results[CubeFace.FRONT]
+    RIGHT.rotate_ccw()
+    time.sleep(0.05)
+    DOWN.rotate_cw()
+    time.sleep(0.05)
+    RIGHT.rotate_cw()
+    time.sleep(delay)         
+    down_state[0] = lower_cam.capture_results[CubeFace.FRONT][0] 
+    down_state[1] = lower_cam.capture_results[CubeFace.FRONT][1]
+    RIGHT.rotate_ccw()
+    time.sleep(0.05) 
+    DOWN.rotate_cw()
+    time.sleep(0.05)
+    RIGHT.rotate_cw()
+    time.sleep(delay)
+    down_state[6] = lower_cam.capture_results[CubeFace.FRONT][0] 
+    down_state[3] = lower_cam.capture_results[CubeFace.FRONT][1]
+    RIGHT.rotate_ccw()
+    time.sleep(0.05) 
+    DOWN.rotate_cw()
+    time.sleep(0.05)
+    RIGHT.rotate_cw()
+    time.sleep(delay)
+    down_state[7] = lower_cam.capture_results[CubeFace.FRONT][1] 
+
+    RIGHT.rotate_ccw()
+    time.sleep(0.05) 
+    DOWN.rotate_cw()
+    time.sleep(0.05)
+
+    # Left scanning    
+    left_state = [None for _ in range(9)]
+    left_state[4] = Color.ORANGE
+    time.sleep(delay)
+    UP.rotate_ccw()
+    time.sleep(0.05)
+    FRONT.rotate_cw()
+    time.sleep(delay) 
+    (left_state[0], left_state[1], left_state[2]) = lower_cam.capture_results[CubeFace.FRONT]
+    FRONT.rotate_ccw()
+    time.sleep(0.05)
+    UP.rotate_cw()
+    time.sleep(0.05)
+    LEFT.rotate_cw()
+    time.sleep(0.05)
+    UP.rotate_ccw()
+    time.sleep(0.05)
+    FRONT.rotate_cw()
+    time.sleep(delay) 
+    left_state[6] = lower_cam.capture_results[CubeFace.FRONT][0] 
+    left_state[3] = lower_cam.capture_results[CubeFace.FRONT][1]
+    FRONT.rotate_ccw()
+    time.sleep(0.05)
+    UP.rotate_cw()
+    time.sleep(0.05)
+    LEFT.rotate_cw()
+    time.sleep(0.05)
+    UP.rotate_ccw()
+    time.sleep(0.05)
+    FRONT.rotate_cw()
+    time.sleep(delay) 
+    left_state[8] = lower_cam.capture_results[CubeFace.FRONT][0] 
+    left_state[7] = lower_cam.capture_results[CubeFace.FRONT][1]
+    FRONT.rotate_ccw()
+    time.sleep(0.05)
+    UP.rotate_cw()
+    time.sleep(0.05)
+    LEFT.rotate_cw()
+    time.sleep(0.05)
+    UP.rotate_ccw()
+    time.sleep(0.05)
+    FRONT.rotate_cw()
+    time.sleep(delay) 
+    left_state[5] = lower_cam.capture_results[CubeFace.FRONT][1]
+    FRONT.rotate_ccw()
+    time.sleep(0.05)
+    UP.rotate_cw()
+    time.sleep(0.05)
+    LEFT.rotate_cw()
+
+    # Back scanning    
+    back_state = [None for _ in range(9)]
+    back_state[4] = Color.BLUE
+    time.sleep(delay)
+    RIGHT.rotate_180()
+    time.sleep(delay) 
+    (back_state[6], back_state[3], back_state[0]) = lower_cam.capture_results[CubeFace.FRONT]
+    RIGHT.rotate_180()
+    time.sleep(0.05)
+    BACK.rotate_cw()
+    time.sleep(0.05)
+    RIGHT.rotate_180()
+    time.sleep(delay)
+    back_state[8] = lower_cam.capture_results[CubeFace.FRONT][0] 
+    back_state[7] = lower_cam.capture_results[CubeFace.FRONT][1]
+    RIGHT.rotate_180()
+    time.sleep(0.05)
+    BACK.rotate_cw()
+    time.sleep(0.05)
+    RIGHT.rotate_180()
+    time.sleep(delay)
+    back_state[2] = lower_cam.capture_results[CubeFace.FRONT][0] 
+    back_state[5] = lower_cam.capture_results[CubeFace.FRONT][1]
+    RIGHT.rotate_180()
+    time.sleep(0.05)
+    BACK.rotate_cw()
+    time.sleep(0.05)
+    RIGHT.rotate_180()
+    time.sleep(delay)
+    back_state[1] = lower_cam.capture_results[CubeFace.FRONT][1] 
+
+    RIGHT.rotate_180()
+    time.sleep(0.05)
+    BACK.rotate_cw()
+    time.sleep(0.05)
+
+
+    return up_state + right_state + front_state + down_state + left_state + back_state
+
+
 # Used to abort solves/scrambles
 abort_flag = False  
 
 def solve(color_string: str = None) -> bool:
-    start = time.time()
-    cube_state = unpack_colors(upper_cam.capture_results | lower_cam.capture_results)    
     cube_string = ""
     if color_string:
         for color in color_lit_to_enum(color_string):
             cube_string += color_to_face[color].value
     else:
-        for color in cube_state:
+        state = turn_to_get_state()
+        print(state)
+        for color in state:
             cube_string += color_to_face[color].value
+    
     try:    
         moves = kociemba.solve(cube_string)
     except:
         print(f"Invalid cube string! {cube_string}")
         return False
+
+    for i in range(7):
+        print(f"About to solve in {7-i}s")
+        time.sleep(1)
+    start = time.time()
     
+    # dummy solve to contribute to time
+    kociemba.solve(cube_string)
     i = 0
     while i < len(moves):
         global abort_flag

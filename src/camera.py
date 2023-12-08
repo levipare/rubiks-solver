@@ -39,7 +39,7 @@ class CubeCamera:
 
         # reset the last detected color
         for group in self.__capture_groups:
-            self.capture_results[group.face_name] = [None for _ in range(8)]
+            self.capture_results[group.face_name] = [None for _ in range(len(group.facelets))]
         # Launch video capture
         self.__cap = cv.VideoCapture(index)
         if not self.__cap.isOpened():
@@ -77,7 +77,7 @@ class CubeCamera:
             # loop through all faces associated with the camera
             for group in self.__capture_groups:
                 # loop through each facelet of the face 
-                for i in range(8):
+                for i in range(len(group.facelets)):
                     x = group.facelets[i][0]
                     y = group.facelets[i][1]
                     detection = detect_color(frame, i, x, y) 
